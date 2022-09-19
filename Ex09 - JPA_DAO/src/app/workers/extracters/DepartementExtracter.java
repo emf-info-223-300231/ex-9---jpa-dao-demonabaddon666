@@ -3,7 +3,8 @@ package app.workers.extracters;
 import app.beans.Departement;
 import app.helpers.BeanExtracter;
 import app.helpers.DateTimeLib;
-import java.util.Date;
+
+import java.time.LocalDate;
 
 /**
  * Extracteur d'une ligne de texte vers un bean "Departement".
@@ -24,7 +25,7 @@ public class DepartementExtracter implements BeanExtracter<Departement> {
     if (tab.length > 2) {
       d.setDepartement(tab[0]);
       d.setLocalite(tab[1]);
-      Date date = DateTimeLib.stringToSqldate(text);
+      LocalDate date = DateTimeLib.dateToLocalDate(DateTimeLib.sqldateToDate(DateTimeLib.stringToSqldate(text)));
       d.setDateCreation(date);
     }
     return d;

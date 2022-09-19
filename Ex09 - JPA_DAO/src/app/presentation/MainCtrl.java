@@ -1,30 +1,27 @@
 package app.presentation;
 
 
+import app.beans.Departement;
+import app.beans.Localite;
+import app.beans.Personne;
 import app.exceptions.MyDBException;
-import app.helpers.DateTimeLib;
 import app.helpers.JfxPopup;
 import app.workers.DbWorker;
 import app.workers.PersonneManager;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 /**
  *
@@ -67,9 +64,9 @@ public class MainCtrl implements Initializable {
     @FXML
     private DatePicker dateNaissance;
     @FXML
-    private ComboBox<?> cbxLocalite;
+    private ComboBox<Localite> cbxLocalite;
     @FXML
-    private ComboBox<?> cbxDepartement;
+    private ComboBox<Departement> cbxDepartement;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -203,11 +200,11 @@ public class MainCtrl implements Initializable {
         if (p == null) {
             return;
         }
-        txtPK.setText(String.valueOf(p.getPkPers()));
+        txtPK.setText(String.valueOf(p.getId()));
         txtPrenom.setText(p.getPrenom());
         txtNom.setText(p.getNom());
-        dateNaissance.setValue(DateTimeLib.dateToLocalDate(p.getDatenaissance()));
-        txtNo.setText(String.valueOf(p.getNorue()));
+        dateNaissance.setValue(p.getDateNaissance());
+        txtNo.setText(String.valueOf(p.getNoRue()));
         txtRue.setText(p.getRue());
         cbxDepartement.setValue(p.getFkDep());
         cbxLocalite.setValue(p.getFkLoc());
@@ -221,7 +218,7 @@ public class MainCtrl implements Initializable {
         }
         p.setPrenom(txtPrenom.getText());
         p.setNom(txtNom.getText());
-        p.setDatenaissance(DateTimeLib.localDateToDate(dateNaissance.getValue()));
+        p.setDateNaissance(dateNaissance.getValue());
         p.setRue(txtRue.getText());
         cbxDepartement.getSelectionModel();
         p.setFkDep(cbxDepartement.getValue());
@@ -229,9 +226,9 @@ public class MainCtrl implements Initializable {
         p.setActif(ckbActif.isSelected());
 
         try {
-            p.setNorue(Integer.parseInt(txtNo.getText()));
+            p.setNoRue(Integer.parseInt(txtNo.getText()));
         } catch (NumberFormatException e) {
-            p.setNorue(0);
+            p.setNoRue(0);
         }
         try {
             p.setSalaire(new BigDecimal(txtSalaire.getText()));
@@ -299,7 +296,8 @@ public class MainCtrl implements Initializable {
     }
 
     @FXML
-    private void menuRechercher(ActionEvent event) {
+    private void menuRechercher(ActionEvent event) throws MyDBException {
         String nomARechercher = JfxPopup.askInfo("Recherche", "Rechercher une personne avec le son nom", "Insérer le nom à rechercher");
+        afficherPersonne(dbWrk.rechercherPersonneAvecNom(nomARechercher));
     }
 }

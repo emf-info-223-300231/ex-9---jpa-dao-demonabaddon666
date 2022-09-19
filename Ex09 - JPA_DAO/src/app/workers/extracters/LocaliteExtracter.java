@@ -17,7 +17,7 @@ public class LocaliteExtracter implements BeanExtracter<Localite> {
      Localite l = new Localite();
      if (tab.length > 6) {
        l.setNpa(Integer.parseInt(tab[2]));
-       l.setPkLoc(l.getNpa()*100 + Integer.parseInt(tab[3]));
+       l.setId(l.getNpa()*100 + Integer.parseInt(tab[3]));
        l.setLocalite(tab[4]);
        l.setCanton(tab[6]);
      }

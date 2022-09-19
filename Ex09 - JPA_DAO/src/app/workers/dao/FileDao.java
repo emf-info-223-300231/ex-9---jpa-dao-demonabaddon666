@@ -3,6 +3,7 @@ package app.workers.dao;
 import app.exceptions.MyFileException;
 import app.helpers.BeanExtracter;
 import app.helpers.SystemLib;
+
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class FileDao<E> implements FileDaoItf<E> {
    * @param fichier
    * @param nomCharset
    * @return 
-   * @throws app.exceptions.MyFileException
+   * @throws MyFileException
    */
   @Override
   public List<E> lireFichierTexte(File fichier, String nomCharset) throws MyFileException {

@@ -1,6 +1,10 @@
 package app.workers;
 
+import app.beans.Departement;
+import app.beans.Localite;
+import app.beans.Personne;
 import app.exceptions.MyDBException;
+
 import java.io.File;
 import java.util.List;
 

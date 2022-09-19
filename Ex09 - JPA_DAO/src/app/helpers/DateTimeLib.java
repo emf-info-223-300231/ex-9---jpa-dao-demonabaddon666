@@ -1,11 +1,6 @@
 package app.helpers;
 
-import java.text.DateFormat;
-import java.text.DateFormatSymbols;
-import java.text.DecimalFormat;
-import java.text.FieldPosition;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -999,7 +994,7 @@ public class DateTimeLib {
    * @return une date au format java.util.Date
    */
   public static Date sqldateToDate(java.sql.Date sqlDate) {
-    return new java.util.Date(sqlDate.getTime());
+    return new Date(sqlDate.getTime());
   }
 
   /**

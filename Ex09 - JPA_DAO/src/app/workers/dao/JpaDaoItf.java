@@ -1,8 +1,8 @@
 package app.workers.dao;
 
 import app.exceptions.MyDBException;
+
 import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  * Définit les services minimaux de la couche DAO (écrite pour JPA).

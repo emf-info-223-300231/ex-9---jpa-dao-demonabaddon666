@@ -2,9 +2,10 @@ package app.workers.dao;
 
 import app.exceptions.MyDBException;
 import app.helpers.SystemLib;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.*;
 
 /**
  * Implémentation de la couche DAO d'après l'API JpaDaoAPI. Equivalent à un
@@ -26,7 +27,7 @@ public class JpaDao<E, PK> implements JpaDaoItf<E, PK> {
      *
      * @param pu
      * @param cl
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     public JpaDao(String pu, Class<E> cl) throws MyDBException {
         this.cl = cl;
@@ -43,10 +44,18 @@ public class JpaDao<E, PK> implements JpaDaoItf<E, PK> {
      * Ajoute un objet.
      *
      * @param e l'objet à persister dans la BD
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     @Override
     public void creer(E e) throws MyDBException {
+        try{
+            et.begin();
+            em.persist(e);
+            et.commit();
+        }catch (Exception ex){
+            if(et.isActive())
+                et.rollback();
+        }
     }
 
     /**
@@ -54,7 +63,7 @@ public class JpaDao<E, PK> implements JpaDaoItf<E, PK> {
      *
      * @param pk l'identifiant de l'objet à lire
      * @return l'objet lu
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     @Override
     public E lire(PK pk) throws MyDBException {
@@ -74,13 +83,13 @@ public class JpaDao<E, PK> implements JpaDaoItf<E, PK> {
      * Modifie un objet dans la BD.
      *
      * @param e l'objet à modifier
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     @Override
     public void modifier(E e) throws MyDBException {
         try {
             et.begin();
-            e = em.merge(e);
+            em.merge(e);
             et.commit();
         } catch (OptimisticLockException ex) {
             if (et.isActive()) {
@@ -106,7 +115,7 @@ public class JpaDao<E, PK> implements JpaDaoItf<E, PK> {
      * Efface un objet d'après son identifiant (PK).
      *
      * @param pk l'identifiant de l'objet à lire
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     @Override
     public void effacer(PK pk) throws MyDBException {
@@ -126,11 +135,22 @@ public class JpaDao<E, PK> implements JpaDaoItf<E, PK> {
         }
     }
 
+    private void effacerObjet (E e) throws MyDBException{
+        try{
+            et.begin();
+            em.remove(e);
+            et.commit();
+        }catch (Exception ex){
+            if(et.isActive())
+                et.rollback();
+        }
+    }
+
     /**
      * Retourne le nombre d'objets actuellement dans une table de la DB.
      *
      * @return le nombre d'objets
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     @Override
     public long compter() throws MyDBException {
@@ -151,19 +171,21 @@ public class JpaDao<E, PK> implements JpaDaoItf<E, PK> {
      * @param prop la propriété sur laquelle faire la recherche
      * @param valeur la valeur de cette propriété
      * @return l'objet recherché ou null
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     @Override
     @SuppressWarnings("unchecked")
     public E rechercher(String prop, Object valeur) throws MyDBException {
-        return null;
+        Query q = em.createQuery("SELECT e FROM "+cl.getSimpleName()+" e WHERE e."+prop+ " = :value");
+        q.setParameter("value",valeur);
+        return (E) q.getSingleResult();
     }
 
     /**
      * Récupère une liste avec tous les objets de la table.
      *
      * @return une liste d'objets.
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -184,31 +206,39 @@ public class JpaDao<E, PK> implements JpaDaoItf<E, PK> {
      * transaction.
      *
      * @return le nombre d'objets effacés
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     @Override
     public int effacerListe() throws MyDBException {
-        int nb;
-        return nb;
+        int i = 0;
+        for (E o :lireListe()) {
+            effacerObjet(o);
+            i++;
+        }
+        return i;
     }
 
     /**
      * Sauve une liste globale dans une seule transaction.
      *
      * @param list
-     * @return TRUE si l'opération a pu se dérouler correctement
-     * @throws app.exceptions.MyDBException
+     * @return > 0 si l'opération a pu se dérouler correctement
+     * @throws MyDBException
      */
     @Override
     public int sauverListe(List<E> list) throws MyDBException {
-        int nb = 0;
-        return nb;
+        int i = 0;
+        for (E o :list) {
+            creer(o);
+            i++;
+        }
+        return i;
     }
 
     /**
      * Déconnexion
      *
-     * @throws app.exceptions.MyDBException
+     * @throws MyDBException
      */
     @Override
     public void deconnecter() {

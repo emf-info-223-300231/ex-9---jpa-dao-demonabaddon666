@@ -1,5 +1,3 @@
-import app.beans.Departement;
-import app.beans.Localite;
 import app.exceptions.MyDBException;
 import app.exceptions.MyFileException;
 import app.helpers.SystemLib;

@@ -1,11 +1,12 @@
 package app.helpers;
 
-import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
+
+import java.util.Optional;
 
 /**
  * Affichage de popups.
